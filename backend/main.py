@@ -39,21 +39,37 @@ def get_stock(symbol: str):
         ticker = yf.Ticker(symbol + ".NS")
         info = ticker.fast_info
 
+        def safe_number(value):
+            try:
+                value = float(value)
+
+                if value != value:  # NaN check
+                    return 0
+
+                return value
+            except:
+                return 0
+
         return {
             "symbol": symbol,
             "name": symbol,
-            "price": info.get("lastPrice", 0),
+            "price": safe_number(info.get("lastPrice")),
             "change": 0,
-            "change_percent": round(info.get("yearChange", 0) * 100, 2),
-            "market_cap": info.get("marketCap", 0),
-            "volume": info.get("lastVolume", 0),
-            "high": info.get("dayHigh", 0),
-            "low": info.get("dayLow", 0),
-            "open": info.get("open", 0),
+            "change_percent": round(
+                safe_number(info.get("yearChange")) * 100,
+                2,
+            ),
+            "market_cap": safe_number(info.get("marketCap")),
+            "volume": safe_number(info.get("lastVolume")),
+            "high": safe_number(info.get("dayHigh")),
+            "low": safe_number(info.get("dayLow")),
+            "open": safe_number(info.get("open")),
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "error": str(e)
+        }
 
 
 @app.get("/stock/{symbol}/history")
@@ -114,12 +130,15 @@ def get_popular_stocks():
             if year_change != year_change:  # NaN check
                 year_change = 0
 
-            price = info.get("lastPrice", 0)
+          price = info.get("lastPrice", 0)
 
-            try:
-                price = float(price)
-            except:
-                price = 0
+try:
+    price = float(price)
+except:
+    price = 0
+
+if price != price:
+    price = 0
 
             result.append({
                 "symbol": symbol.replace(".NS", ""),
