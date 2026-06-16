@@ -19,14 +19,26 @@ function StockChart({ symbol }) {
 
   useEffect(() => {
     if (!symbol) return;
+
     setLoading(true);
+
     axios
-    get(`https://stocksense-1yqk.onrender.com/stock/${symbol}/history?period=${period}`)
+      .get(
+        `https://stocksense-1yqk.onrender.com/stock/${symbol}/history?period=${period}`
+      )
       .then((res) => {
-        setData(res.data.data);
+        console.log("Chart Data:", res.data);
+
+        if (res.data.data) {
+          setData(res.data.data);
+        }
+
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Chart Error:", err);
+        setLoading(false);
+      });
   }, [symbol, period]);
 
   if (!symbol) return null;
@@ -51,7 +63,7 @@ function StockChart({ symbol }) {
         <div className="loading">Loading chart...</div>
       ) : (
         <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
@@ -59,20 +71,22 @@ function StockChart({ symbol }) {
                   <stop offset="95%" stopColor="#7c6af7" stopOpacity={0} />
                 </linearGradient>
               </defs>
+
               <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
+
               <XAxis
                 dataKey="date"
                 tick={{ fill: "#888899", fontSize: 11 }}
                 tickLine={false}
-                interval="preserveStartEnd"
               />
+
               <YAxis
                 tick={{ fill: "#888899", fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(v) => `₹${v.toLocaleString("en-IN")}`}
                 width={80}
               />
+
               <Tooltip
                 contentStyle={{
                   background: "#1a1a24",
@@ -80,8 +94,8 @@ function StockChart({ symbol }) {
                   borderRadius: "8px",
                   color: "#e8e8f0",
                 }}
-                formatter={(value) => [`₹${value.toLocaleString("en-IN")}`, "Close"]}
               />
+
               <Area
                 type="monotone"
                 dataKey="close"
@@ -98,4 +112,3 @@ function StockChart({ symbol }) {
 }
 
 export default StockChart;
-
