@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import yfinance as yf
+import pandas as pd
 
 app = FastAPI()
 
@@ -61,19 +62,24 @@ def get_history(symbol: str, period: str = "1mo"):
         ticker = yf.Ticker(symbol + ".NS")
         hist = ticker.history(period=period)
 
+        if hist.empty:
+            return {
+                "symbol": symbol,
+                "period": period,
+                "data": []
+            }
+
         data = []
 
         for date, row in hist.iterrows():
-            data.append(
-                {
-                    "date": str(date.date()),
-                    "open": round(row["Open"], 2),
-                    "close": round(row["Close"], 2),
-                    "high": round(row["High"], 2),
-                    "low": round(row["Low"], 2),
-                    "volume": int(row["Volume"]),
-                }
-            )
+            data.append({
+                "date": str(date.date()),
+                "open": float(row["Open"]) if not pd.isna(row["Open"]) else 0,
+                "close": float(row["Close"]) if not pd.isna(row["Close"]) else 0,
+                "high": float(row["High"]) if not pd.isna(row["High"]) else 0,
+                "low": float(row["Low"]) if not pd.isna(row["Low"]) else 0,
+                "volume": int(row["Volume"]) if not pd.isna(row["Volume"]) else 0,
+            })
 
         return {
             "symbol": symbol,
