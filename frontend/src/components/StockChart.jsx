@@ -21,7 +21,7 @@ function StockChart({ symbol }) {
     if (!symbol) return;
     setLoading(true);
     axios
-      .get(`http://127.0.0.1:8000/stock/${symbol}/history?period=${period}`)
+    get(`https://stocksense-1yqk.onrender.com/stock/${symbol}/history?period=${period}`)
       .then((res) => {
         setData(res.data.data);
         setLoading(false);

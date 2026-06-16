@@ -16,8 +16,7 @@ function App() {
 
   // Load popular stocks on page load
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/stocks/popular")
+    axios.get("https://stocksense-1yqk.onrender.com/stocks/popular")
       .then((res) => {
         setStocks(res.data);
         setLoading(false);
@@ -41,7 +40,7 @@ useEffect(() => {
     setSelectedSymbol(symbol);
     setDetailLoading(true);
     axios
-      .get(`http://127.0.0.1:8000/stock/${symbol}`)
+    .get(`https://stocksense-1yqk.onrender.com/stock/${symbol}`)
       .then((res) => {
         setSelectedStock(res.data);
         setDetailLoading(false);

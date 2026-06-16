@@ -11,7 +11,7 @@ function SearchBar({ onResult }) {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/search/${query.trim().toUpperCase()}`);
+      const res = await axios.get(`https://stocksense-1yqk.onrender.com/search/${query.trim().toUpperCase()}`);
       if (res.data.found) {
         onResult(res.data);
       } else {
