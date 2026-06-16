@@ -94,16 +94,33 @@ def get_popular_stocks():
             ticker = yf.Ticker(symbol)
             info = ticker.fast_info
 
-            result.append(
-                {
-                    "symbol": symbol.replace(".NS", ""),
-                    "name": symbol.replace(".NS", ""),
-                    "price": info.get("lastPrice", 0),
-                    "change_percent": round(
-                        info.get("yearChange", 0) * 100, 2
-                    ),
-                }
-            )
+            year_change = info.get("yearChange", 0)
+
+            # Handle None and NaN safely
+            if year_change is None:
+                year_change = 0
+
+            try:
+                year_change = float(year_change)
+            except:
+                year_change = 0
+
+            if year_change != year_change:  # NaN check
+                year_change = 0
+
+            price = info.get("lastPrice", 0)
+
+            try:
+                price = float(price)
+            except:
+                price = 0
+
+            result.append({
+                "symbol": symbol.replace(".NS", ""),
+                "name": symbol.replace(".NS", ""),
+                "price": price,
+                "change_percent": round(year_change * 100, 2),
+            })
 
         except Exception as e:
             print(f"Error fetching {symbol}: {e}")
