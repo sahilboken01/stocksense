@@ -99,3 +99,11 @@ def search_stock(query: str):
             return {"found": False, "message": "Stock not found"}
     except:
         return {"found": False, "message": "Error fetching stock"}
+@app.get("/debug")
+def debug():
+    ticker = yf.Ticker("RELIANCE.NS")
+
+    try:
+        return dict(ticker.fast_info)
+    except Exception as e:
+        return {"error": str(e)}
