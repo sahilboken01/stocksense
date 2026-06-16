@@ -116,9 +116,9 @@ def get_popular_stocks():
             ticker = yf.Ticker(symbol)
             info = ticker.fast_info
 
+            # Safe year change
             year_change = info.get("yearChange", 0)
 
-            # Handle None and NaN safely
             if year_change is None:
                 year_change = 0
 
@@ -130,20 +130,21 @@ def get_popular_stocks():
             if year_change != year_change:  # NaN check
                 year_change = 0
 
-          price = info.get("lastPrice", 0)
+            # Safe price
+            price = info.get("lastPrice", 0)
 
-try:
-    price = float(price)
-except:
-    price = 0
+            try:
+                price = float(price)
+            except:
+                price = 0
 
-if price != price:
-    price = 0
+            if price != price:  # NaN check
+                price = 0
 
             result.append({
                 "symbol": symbol.replace(".NS", ""),
                 "name": symbol.replace(".NS", ""),
-                "price": price,
+                "price": round(price, 2),
                 "change_percent": round(year_change * 100, 2),
             })
 
