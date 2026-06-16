@@ -29,15 +29,16 @@ def home():
 @app.get("/stock/{symbol}")
 def get_stock(symbol: str):
     ticker = yf.Ticker(symbol + ".NS")
-    info = ticker.info
+    info = ticker.fast_info
+
     return {
         "symbol": symbol,
-        "name": info.get("longName", symbol),
-        "price": info.get("currentPrice", 0),
-        "change": info.get("regularMarketChange", 0),
-        "change_percent": info.get("regularMarketChangePercent", 0),
+        "name": symbol,
+        "price": info.get("lastPrice", 0),
+        "change": 0,
+        "change_percent": round(info.get("yearChange", 0) * 100, 2),
         "market_cap": info.get("marketCap", 0),
-        "volume": info.get("volume", 0),
+        "volume": info.get("lastVolume", 0),
         "high": info.get("dayHigh", 0),
         "low": info.get("dayLow", 0),
         "open": info.get("open", 0),
@@ -68,14 +69,15 @@ def get_popular_stocks():
     result = []
     for symbol in POPULAR_STOCKS:
         try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
-            result.append({
-                "symbol": symbol.replace(".NS", ""),
-                "name": info.get("longName", symbol),
-                "price": info.get("currentPrice", 0),
-                "change_percent": round(info.get("regularMarketChangePercent", 0), 2),
-            })
+            info = ticker.fast_info
+
+         info = ticker.info
+          result.append({
+    "symbol": symbol.replace(".NS", ""),
+    "name": symbol.replace(".NS", ""),
+    "price": info.get("lastPrice", 0),
+    "change_percent": round(info.get("yearChange", 0) * 100, 2),
+})
         except:
             pass
     return result
@@ -87,13 +89,13 @@ def search_stock(query: str):
     symbol = query.upper() + ".NS"
     try:
         ticker = yf.Ticker(symbol)
-        info = ticker.info
-        if info.get("currentPrice"):
+        info = ticker.fast_info
+        if info.get("lastPrice"):
             return {
                 "found": True,
                 "symbol": query.upper(),
                 "name": info.get("longName", query),
-                "price": info.get("currentPrice", 0),
+                "price": info.get("lastPrice", 0),
             }
         else:
             return {"found": False, "message": "Stock not found"}
